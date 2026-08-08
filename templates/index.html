@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Performance Predictor</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+
+    <div class="header">
+
+        <h1>Student Performance Predictor</h1>
+
+        <p>
+            Machine Learning based student performance prediction
+        </p>
+
+    </div>
+
+
+    <!-- Prediction Form -->
+
+    <div class="card">
+
+        <form id="predictionForm">
+
+
+            <div class="form-group">
+
+                <label for="study_hours">
+                    Study Hours per Day
+                </label>
+
+                <input
+                    type="number"
+                    id="study_hours"
+                    min="0"
+                    max="24"
+                    step="0.1"
+                    placeholder="Example: 6"
+                    required
+                >
+
+                <span class="help-text">
+                    Enter study hours between 0 and 24.
+                </span>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="attendance">
+                    Attendance Percentage
+                </label>
+
+                <input
+                    type="number"
+                    id="attendance"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="Example: 85"
+                    required
+                >
+
+                <span class="help-text">
+                    Enter attendance between 0 and 100.
+                </span>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="previous_score">
+                    Previous Exam Score
+                </label>
+
+                <input
+                    type="number"
+                    id="previous_score"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="Example: 72"
+                    required
+                >
+
+                <span class="help-text">
+                    Enter the previous score between 0 and 100.
+                </span>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="assignments_completed">
+                    Assignments Completed
+                </label>
+
+                <input
+                    type="number"
+                    id="assignments_completed"
+                    min="0"
+                    placeholder="Example: 8"
+                    required
+                >
+
+            </div>
+
+
+            <button type="submit">
+                Predict Performance
+            </button>
+
+
+            <button
+                type="button"
+                class="reset-button"
+                onclick="resetForm()">
+
+                Reset
+
+            </button>
+
+        </form>
+
+
+        <!-- Prediction Result -->
+
+        <div class="result">
+
+            <h2>Prediction Result</h2>
+
+            <div class="score">
+
+                <span id="prediction">-</span>
+
+            </div>
+
+            <div class="performance">
+
+                <span id="performance">Enter details above</span>
+
+            </div>
+
+            <p id="error" class="error"></p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Project Information -->
+
+    <div class="info">
+
+        <h3>About This Project</h3>
+
+        <p>
+            This application uses a Machine Learning model
+            to predict a student's final exam score.
+        </p>
+
+        <ul>
+
+            <li>Study hours</li>
+
+            <li>Attendance percentage</li>
+
+            <li>Previous exam score</li>
+
+            <li>Completed assignments</li>
+
+        </ul>
+
+        <p>
+            <strong>Algorithm:</strong> Linear Regression
+        </p>
+
+    </div>
+
+
+    <!-- Footer -->
+
+    <div class="footer">
+
+        Cloud-Based Machine Learning Model Deployment Project
+
+    </div>
+
+</div>
+
+
+<script>
+
+document
+.getElementById("predictionForm")
+.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+
+    const study_hours =
+        parseFloat(
+            document.getElementById("study_hours").value
+        );
+
+
+    const attendance =
+        parseFloat(
+            document.getElementById("attendance").value
+        );
+
+
+    const previous_score =
+        parseFloat(
+            document.getElementById("previous_score").value
+        );
+
+
+    const assignments_completed =
+        parseInt(
+            document.getElementById("assignments_completed").value
+        );
+
+
+    const response = await fetch("/predict", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+            study_hours: study_hours,
+
+            attendance: attendance,
+
+            previous_score: previous_score,
+
+            assignments_completed:
+                assignments_completed
+
+        })
+
+    });
+
+
+    const data = await response.json();
+
+
+    if (!response.ok) {
+
+        document.getElementById("error")
+            .textContent = data.error;
+
+        document.getElementById("prediction")
+            .textContent = "-";
+
+        document.getElementById("performance")
+            .textContent = "Invalid input";
+
+        return;
+
+    }
+
+
+    document.getElementById("error")
+        .textContent = "";
+
+
+    document.getElementById("prediction")
+        .textContent =
+        data.predicted_final_score;
+
+
+    document.getElementById("performance")
+        .textContent =
+        data.performance;
+
+});
+
+
+function resetForm() {
+
+    document
+        .getElementById("predictionForm")
+        .reset();
+
+    document
+        .getElementById("prediction")
+        .textContent = "-";
+
+    document
+        .getElementById("performance")
+        .textContent =
+        "Enter details above";
+
+    document
+        .getElementById("error")
+        .textContent = "";
+
+}
+
+</script>
+
+
+</body>
+
+</html>
